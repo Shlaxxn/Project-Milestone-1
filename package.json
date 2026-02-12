@@ -1,0 +1,16 @@
+{
+  "name": "infoi451-app",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "Jacob Bohlmann",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1"
+  }
+}
