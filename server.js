@@ -1,7 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const path = require("path");
-const data = require("./data-service");
+
 
 const app = express();
 dotenv.config();
@@ -17,63 +17,33 @@ app.use(express.static(path.join(__dirname, "Public")));
 //   res.send("Hello World");
 // });
 
+//ROUTES BELOW
+
 // home route
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "home.html"));
 });
 
-// about route
-app.get("/about", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "about.html"));
+// calender route
+app.get("/calender", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "calender.html"));
 });
 
-// employees route
-app.get("/employees", (req, res) => {
-  data
-    .getAllEmployees()
-    .then((data) => {
-      res.json(data);
-    })
-    .catch((err) => {
-      res.json({ message: err });
-    });
-
-  // res.send("Hello");
+// PSA route
+app.get("/psa", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "psa.html"));
 });
 
-// managers route
-app.get("/managers", (req, res) => {
-  data
-    .getManagers()
-    .then((data) => {
-      res.json(data);
-    })
-    .catch((err) => {
-      res.json({ message: err });
-    });
+// login route
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "login.html"));
 });
 
-// departments route
-app.get("/departments", (req, res) => {
-  data
-    .getDepartments()
-    .then((data) => {
-      res.json(data);
-    })
-    .catch((err) => {
-      res.json({ message: err });
-    });
-});
 
+// run "node server.js" to start the setup server
 
 // setup server
-data
-  .initialize()
-  .then(function () {
-    app.listen(HTTP_PORT, function () {
-      console.log(`App listening on port: ${HTTP_PORT}`);
-    });
-  })
-  .catch(function (err) {
-    console.log(`Unable to start server: ${err}`);
-  });
+app.listen(HTTP_PORT, function () {
+  console.log(`App listening on port: ${HTTP_PORT}`);
+});
+  
