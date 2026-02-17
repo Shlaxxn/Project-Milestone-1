@@ -15,3 +15,18 @@ footer{
   bottom: 0;
   width: 100%;
 }
+.loginContainer{
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center;     /* Centers vertically */
+  margin: 0;     /* Remove default margin */
+  padding: 0;    /* Remove default padding */
+  box-sizing: border-box; /* Ensures padding and borders are included in the 100vw/100vh size, preventing overflow/scrollbars */
+  height: 75vh;           /* Ensures the container fills the full page height */
+  outline: solid 1px black;
+}
+.loginForm{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
