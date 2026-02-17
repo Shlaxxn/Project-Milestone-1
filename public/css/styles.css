@@ -1,1 +1,17 @@
-/*hello this is casey*/
+.nav {
+  background-color: #2a5496;
+  padding: 15px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+footer{
+  background-color: #2a5496;
+  color:white;  
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
