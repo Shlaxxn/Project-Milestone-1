@@ -47,14 +47,21 @@
     <div class="container mt-4">
       <div class="row">
         
-        <div class="col-md-12">
-          <h2>About</h2>
-          <p>
-            Information about the company goes here
-          </p>
+        <div class="loginContainer">
+          <form action="/action_page.php" method="post" class="loginForm">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            <button type="submit">Login</button>
+            <label for="creation">Create Account <a href="accountcreation.html">Here</a></label> 
+        </form>
         </div>
 
-        
       </div>
     </div>
      <footer>
