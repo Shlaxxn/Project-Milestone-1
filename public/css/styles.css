@@ -4,7 +4,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 120px;
   width: 100%;
+}
+.logo-img {
+    height: 80px;
+    width: auto;
+    padding: 10px;
+    display: flex;
+    vertical-align: middle;
 }
 footer{
   background-color: #2a5496;
