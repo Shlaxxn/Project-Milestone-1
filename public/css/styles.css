@@ -1,6 +1,15 @@
+body{
+  margin: 0;
+  padding: 0;
+  height: 1000px;
+}
+nav {
+  padding: 0 !important;
+}
 .nav {
+  margin: 0;
   background-color: #2a5496;
-  padding: 15px 30px;
+  padding: 0px 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
