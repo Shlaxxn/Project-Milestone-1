@@ -40,9 +40,10 @@ footer{
   height: 100vh;
   width: 100%;           /* Ensures the container fills the full page height */
   outline: solid 1px black;
-  background-image: url('../images/pokemoncaseimage-1.png'); 
+  background-image: url('../images/pokemoncaseimage-3.png'); 
   background-size: cover;
   background-position: center;
+  background-color: rgb(84, 83, 83);
   /*filter: blur(8px); /* Blurs only this element */
 }
 .loginForm{
@@ -50,7 +51,7 @@ footer{
   flex-direction: column;
   gap: 5px;
   padding: 25px;
-  background-image: linear-gradient(rgba(100, 100, 100, 0.75), rgba(100, 100, 100, 0.75));
+  background-color: rgba(0, 0, 0, 0.75);
     /* The first part (rgba...) adds a black overlay with 50% opacity */
     background-size: cover;
     background-position: center;
