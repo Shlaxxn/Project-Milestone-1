@@ -60,3 +60,7 @@ table, th, td {
 th, td {
   padding: 10px;
 }
+.welcome {
+  text-align: center;
+  min-height: 50%;
+}
