@@ -73,5 +73,66 @@ th, td {
 }
 .welcome {
   text-align: center;
-  min-height: 50%;
+  align-items: center;
+  min-height: 700px;
+  background-image: url('../images/AACardsStoreFront.jpg');
+  background-size: cover;
+  background-position: center;
+}
+.greating {
+  text-align: center;
+  margin-top: 200px;
+  margin-bottom: auto;
+}
+.about {
+  color:white;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  min-height: 700px;
+  background-image: url('../images/AACardsStoreFront2.jpg');
+  background-size: cover;
+  background-position: center;
+  height: auto;
+  width: 100%;
+  text-shadow: #f4f4f4;
+}
+.inside {
+  height: 300px;
+}
+.banner {
+  /* Hide any overflowing content outside the banner area */
+  overflow: hidden;
+  /* Ensure content stays on a single line */
+  white-space: nowrap;
+  /* Optional: Add background, padding, or height styling */
+  background-color:orange;
+  color: white;
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+
+.banner-content {
+  /* Use inline-block to keep everything in one line and allow flex properties */
+  display: inline-block;
+  /* Apply the animation */
+  animation: marquee 15s linear infinite;
+  /* Optional: Pause animation on hover */
+  /* For more details, see the BigCommerce article on animation-play-state */
+  animation-play-state: running;
+}
+
+.banner-content:hover {
+  animation-play-state: paused;
+}
+
+/* Define the animation */
+@keyframes marquee {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    /* Translate the content by -50% of its width to create the loop effect */
+    transform: translate(-50%, 0);
+  }
 }
