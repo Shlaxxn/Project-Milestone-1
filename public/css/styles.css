@@ -75,7 +75,7 @@ th, td {
 .welcome {
   text-align: center;
   align-items: center;
-  min-height: 700px;
+  min-height: 100vh;
   background-image: url('../images/AACardsStoreFront.jpg');
   background-size: cover;
   background-position: center;
@@ -90,7 +90,7 @@ th, td {
   text-align: center;
   display: flex;
   align-items: center;
-  min-height: 700px;
+  min-height: 100vh;
   background-image: url('../images/AACardsStoreFront2.jpg');
   background-size: cover;
   background-position: center;
@@ -136,4 +136,7 @@ th, td {
     /* Translate the content by -50% of its width to create the loop effect */
     transform: translate(-50%, 0);
   }
+}
+.psa-table {
+  min-height: 100vh;
 }
