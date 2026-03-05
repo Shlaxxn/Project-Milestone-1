@@ -39,6 +39,10 @@ app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "login.html"));
 });
 
+app.get("/accountcreation.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "accountcreation.html"));
+});
+
 
 // run "node server.js" to start the setup server
 
