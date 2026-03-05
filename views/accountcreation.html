@@ -45,9 +45,9 @@
     </nav>
 
     <!-- Main Content -->
-        <div class="creationForm">
-          <form onsubmit="consol.log('form submitted'); return false;">
-            <table style="border:1px dashed #cdcdcd;padding:6px;">
+        <div class="loginContainer">
+          <form action="/action_page.php" method="post" class="loginForm" style="background-color: #2a5496">
+            <table style="border:1px dashed #cdcdcd;padding:6px;" >
             <tbody>
             <tr>
             <td>
@@ -56,7 +56,11 @@
             <td>
             <input style="width:100%" id="username" type="text" placeholder="Username">
             </td>
-            </tr><td><input style="width:100%" id="email" type="text" placeholder="email"> </td>
+            </tr>
+            <td>
+            <label for="email">Enter your Email:</label>
+            </td>
+            <td><input style="width:100%" id="email" type="text" placeholder="email"> </td>
             <tr>
             <td><label for ="name"> Your Name: </label></td>
             <td><input style="width:100%" id="name" type="text" placeholder="name"> </td>
@@ -70,19 +74,7 @@
             <td><input style="width:100%" id="passwordconfirm" type="password"> </td>
             </tr>
             <tr>
-            <td><colspan ="2">
-            <p><em>Would you like to subscribe to our monthly newsletter?<\em><\p>
-            <input id="Yes" type="radio" name= "newsletter" value="Yes">
-            <input id="No" type="radio" name= "newsletter" value="No">
-            </p>
-            </td>
-            </tr>
-            <tr>
-            <tr>
             <td colspan= "2"><input type="submit" value="Submit">
-            </tr>
-            <tr>
-            <td colspan= "2"><button type="submit">Submit</button>
             </tr>
             </tbody>
             </table>
