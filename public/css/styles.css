@@ -19,18 +19,6 @@ nav {
     vertical-align: middle;
     border-radius: 20px;
 }
-footer{
-  background-color: #2a5496;
-  color:white;  
-  text-align: center;
-  padding: 10px;
-  bottom: 0;
-  width: 100%;
-  display:flex;
-  margin-left: auto;
-  margin-right: auto;
-  height: 100px;
-}
 body {
   height: 100%;
   padding: 0px;
@@ -139,4 +127,39 @@ th, td {
 }
 .psa-table {
   min-height: 100vh;
+}
+footer{
+  background-color: #2a5496;
+  color:white;  
+  align-items: center;
+  padding: 10px;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  height: 80px;
+  justify-content: space-between;
+  font-size:large;
+}
+.social-links a {
+  font-size: 40px;
+  margin-right: 10px;
+  color: white; 
+  text-decoration: none;
+  width: 44px;
+  height: 44px;
+}
+.social-links a :hover{
+  color: lightgray;
+}
+.social-links {
+  flex: 1;
+  text-align: right;
+}
+.footer-name {
+  text-align: center;
+  flex: 1;
+}
+.footer-logo {
+  flex: 1;
+  text-align: right;
 }
