@@ -10,7 +10,7 @@ dotenv.config();
 const HTTP_PORT = process.env.PORT || 8080;
 
 // set static folder
-app.use(express.static(path.join(__dirname, "Public")));
+app.use(express.static(path.join(__dirname, "public")));
 
 // routing setup
 // app.get("/", (req, res) => {
@@ -37,6 +37,10 @@ app.get("/psa", (req, res) => {
 // login route
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "login.html"));
+});
+
+app.get("/accountcreation.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "views", "accountcreation.html"));
 });
 
 
