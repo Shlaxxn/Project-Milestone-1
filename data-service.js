@@ -6,33 +6,54 @@ let customers = [];
 
 module.exports.initialize = function () {
   return new Promise((resolve, reject) => {
+    // helper to parse JSON and default to empty array on empty file
+    const safeParse = (text) => {
+      if (!text || text.trim() === "") return [];
+      return JSON.parse(text);
+    };
+
     fs.readFile("./data/shipments.json", "utf8", (err, data) => {
       if (err) {
         reject("Unable to read the file: shipments.json");
         return;
       }
-    shipments = JSON.parse(data);
+      try {
+        shipments = safeParse(data);
+      } catch (e) {
+        reject("Invalid JSON in shipments.json");
+        return;
+      }
 
       fs.readFile("./data/customers.json", "utf8", (err, data) => {
         if (err) {
           reject("Unable to read the file: customers.json");
           return;
         }
-    customers = JSON.parse(data);
-
-    fs.readFile("./data/orders.json", "utf8", (err, data) => {
-        if (err) {
-          reject("Unable to read the file: orders.json");
+        try {
+          customers = safeParse(data);
+        } catch (e) {
+          reject("Invalid JSON in customers.json");
           return;
         }
-    orders = JSON.parse(data);
 
-    resolve();
+        fs.readFile("./data/orders.json", "utf8", (err, data) => {
+          if (err) {
+            reject("Unable to read the file: orders.json");
+            return;
+          }
+          try {
+            orders = safeParse(data);
+          } catch (e) {
+            reject("Invalid JSON in orders.json");
+            return;
+          }
+
+          resolve();
+        });
       });
     });
   });
-}
-)};
+};
 
 module.exports.addShipment = function (shipmentData) {
   return new Promise((resolve, reject) => {
@@ -47,8 +68,8 @@ module.exports.addShipment = function (shipmentData) {
       }
       resolve();
     });
-  }
-)};
+  });
+};
 
 module.exports.getShipments = function () {
   return new Promise((resolve, reject) => {
