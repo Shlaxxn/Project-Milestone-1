@@ -9,6 +9,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   </head>
   <body>
     <!-- Navbar -->
@@ -59,29 +61,47 @@
                 <th>Date Updated</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>12345</td>
-                <td>Shipped</td>
-                <td>01-01-2026</td>
-              </tr>
-              <tr>
-                <td>12364</td>
-                <td>Waiting</td>
-                <td>02-01-2026</td>
-              </tr>
-            </tbody>
+            <tbody id="psaTableBody"></tbody>
           </table>
-          <caption>There will be more added when JS is added here</caption>
         </div>
 
         
       </div>
     </div>
-     <footer>
+   <footer>
+      <div class="footer-logo">
         <img class="logo-img" id="navbar-logo" src="images/logo.jpg">
+      </div>
+      <div class="footer-name">
         <span class="footer">AA Cards and Collectibles</span>
+      </div>
+      <div class="social-links">
+          <a href="https://www.facebook.com/share/1B6prTw5yZ/?mibextid=wwXIfr" target="_blank">
+          <i class="fab fa-facebook"></i>
+          </a>
+          <a href="https://www.instagram.com/aacardssports?igsh=MWMxNmp5MTRrY2xzNw==" target="_blank">
+          <i class="fab fa-instagram"></i>
+          </a>
+      </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+fetch("/data/shipments.json")
+    .then(response => response.json())
+    .then(data => {
+      const tableBody = document.getElementById("psaTableBody");
+      data.forEach(shipment => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${shipment.shipmentID}</td>
+          <td>${shipment.status}</td>
+          <td>${shipment.date}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    })
+    .catch(error => console.error("Error loading JSON:", error));
+</script>
   </body>
 </html>

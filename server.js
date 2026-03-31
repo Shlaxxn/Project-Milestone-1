@@ -11,6 +11,8 @@ const HTTP_PORT = process.env.PORT || 8080;
 
 // set static folder
 app.use(express.static(path.join(__dirname, "public")));
+// maps data folder to project so json can be read by html
+app.use('/data', express.static('data'));
 
 // routing setup
 // app.get("/", (req, res) => {
