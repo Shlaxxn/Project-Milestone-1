@@ -7,7 +7,14 @@ let customers = [];
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
-mongoose.connect("mongodb+srv://aacardscalendar_db_user:<jODVZR0QxpGBmk4N>@aacardscluster.22qy1qa.mongodb.net/?appName=AACardsCluster");
+let db = mongoose.createConnection("mongodb+srv://aacardscalendar_db_user:<jODVZR0QxpGBmk4N>@aacardscluster.22qy1qa.mongodb.net/?appName=AACardsCluster");
+
+db.on('error', (err)=>{
+console.log("db1 error!");
+});
+db.once('open', ()=>{
+console.log("db1 success!");
+});
 
 var shipmentSchema = new Schema({
 "ShipmentID": Number,
@@ -38,6 +45,7 @@ var Shipment = mongoose.model("Shipment", shipmentSchema);
 var Order = mongoose.model("Order", orderSchema);
 var Customer = mongoose.model("Customer", customerSchema);
 var ShipmentOrder = mongoose.model("ShipmentOrder", shipmentorderSchema);
+
 
 module.exports.initialize = function () {
   return new Promise((resolve, reject) => {

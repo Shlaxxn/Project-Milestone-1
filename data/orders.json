@@ -1,3 +1,19 @@
 [
-    
+    {
+      "employeeNum": 1,
+      "firstName": "Foster",
+      "lastName": "Thorburn",
+      "email": "fthorburn0@myCompany.com",
+      "SSN": "935-74-9919",
+      "addressStreet": "8 Arapahoe Park",
+      "addressCity": "New York",
+      "addressState": "NY",
+      "addressPostal": "20719",
+      "maritalStatus": "single",
+      "isManager": true,
+      "employeeManagerNum": null,
+      "status": "Full Time",
+      "department": 2,
+      "hireDate": "4/30/2014"
+    }
 ]
