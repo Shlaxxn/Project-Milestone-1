@@ -1,0 +1,60 @@
+var testShipment = new Shipment({
+    ShipmentID: 0001,
+    Status: "Pending",
+    Order Count: 5
+});
+
+testShipment.save((err) => {
+    if(err) {
+        console.log("There was an error saving the testShipment.");
+        } else {
+            console.log("The testShipment was saved.");
+        }
+    process.exit();
+});
+
+var testOrder = new Order({
+    OrderID: 12345,
+    CustomerID: 12321,
+    Card Count: 5,
+    Status: "Ordered"
+});
+
+testOrder.save((err) => {
+    if(err) {
+        console.log("There was an error saving the testOrder.");
+        } else {
+            console.log("The testOrder was saved.");
+        }
+    process.exit();
+});
+
+var testCustomer = new Customer({
+    CustomerID: 12321,
+    Name: "John Doe",
+    Email: "jdoe@email.com",
+    PhoneNumber: "999-999-9999"
+});
+
+testCustomer.save((err) => {
+    if(err) {
+        console.log("There was an error saving the testCustomer.");
+        } else {
+            console.log("The testCustomer was saved.");
+        }
+    process.exit();
+});
+
+var testShipmentOrder = new ShipmentOrder({
+    ShipmentID: 0001,
+    OrderID: 12345
+});
+
+testShipmentOrder.save((err) => {
+    if(err) {
+        console.log("There was an error saving the testShipmentOrder.");
+        } else {
+            console.log("The testShipmentOrder was saved.");
+        }
+    process.exit();
+});
