@@ -42,14 +42,16 @@ var Schema = mongoose.Schema;
 var shipmentSchema = new Schema({
 "ShipmentID": Number,
 "Status": String,
-"Order Count": {type: Number, default: 0}
+"Order Count": {type: Number, default: 0},
+"DateShipped": Date
 });
 
 var orderSchema = new Schema({
 "OrderID": Number,
 "CustomerID": Number,
 "Card Count": Number,
-"Status": String
+"Status": String,
+"Date": Date
 });
 
 var customerSchema = new Schema({

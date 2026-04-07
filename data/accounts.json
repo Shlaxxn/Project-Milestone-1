@@ -12,5 +12,19 @@
     "password": "ava2024",
     "name": "Ava Martinez",
     "email": "ava.martinez@example.com"
+  },
+  {
+    "CustomerID": 3,
+    "username": "Shlaxxn",
+    "password": "pass123",
+    "email": "jacobbohlmann45@gmail.com",
+    "name": "jacob bohlmann"
+  },
+  {
+    "CustomerID": 4,
+    "username": "example",
+    "password": "1234",
+    "email": "email@example.com",
+    "name": "bob saget"
   }
 ]

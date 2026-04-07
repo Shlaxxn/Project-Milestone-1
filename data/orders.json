@@ -4,27 +4,27 @@
     "CustomerID": 1,
     "Card Count": 5,
     "Status": "Pending",
-    "date": "2024-06-01"
+    "shippedDate": "2024-06-01"
   },
   {
     "OrderID": 102,
     "CustomerID": 2,
     "Card Count": 8,
     "Status": "Processing",
-    "date": "2024-06-02"
+    "shippedDate": "2024-06-02"
   },
   {
     "OrderID": 103,
     "CustomerID": 3,
     "Card Count": 3,
     "Status": "Delivered",
-    "date": "2024-06-03"
+    "shippedDate": "2024-06-03"
   },
   {
     "OrderID": 104,
     "CustomerID": 1,
     "Card Count": 2,
     "Status": "Shipped",
-    "date": "2024-06-04"
+    "shippedDate": "2024-06-04"
   }
 ]

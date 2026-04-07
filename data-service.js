@@ -3,7 +3,7 @@ const fs = require("fs");
 let shipments = [];
 let orders = [];
 let customers = [];
-let accounts = [];
+
 
 module.exports.initialize = function () {
   return new Promise((resolve, reject) => {
@@ -23,15 +23,15 @@ module.exports.initialize = function () {
         reject("Invalid JSON in shipments.json");
         return;
       }
-      fs.readFile("./data/customers.json", "utf8", (err, data) => {
+      fs.readFile("./data/shipmentorders.json", "utf8", (err, data) => {
         if (err) {
-          reject("Unable to read the file: customers.json");
+          reject("Unable to read the file: shipmentorders.json");
           return;
         }
         try {
-          customers = safeParse(data);
+          shipmentorders = safeParse(data);
         } catch (e) {
-          reject("Invalid JSON in customers.json");
+          reject("Invalid JSON in shipmentorders.json");
           return;
         }
 
@@ -47,79 +47,10 @@ module.exports.initialize = function () {
             return;
           }
 
-          fs.readFile("./data/accounts.json", "utf8", (err, data) => {
-            if (err) {
-              if (err.code === "ENOENT") {
-                accounts = [];
-                resolve();
-                return;
-              }
-              reject("Unable to read the file: accounts.json");
-              return;
-            }
-            try {
-              accounts = safeParse(data);
-            } catch (e) {
-              reject("Invalid JSON in accounts.json");
-              return;
-            }
-            resolve();
-          });
+          resolve();
         });
       });
     });
-  });
-};
-
-module.exports.addAccount = function (accountData) {
-  return new Promise((resolve, reject) => {
-    const username = (accountData.username || "").trim();
-    const password = accountData.password || "";
-    const passwordconfirm = accountData.passwordconfirm || "";
-
-    if (!username || !password || !passwordconfirm) {
-      reject("Username and password are required");
-      return;
-    }
-    if (password !== passwordconfirm) {
-      reject("Passwords do not match");
-      return;
-    }
-    if (accounts.find((a) => a.username.toLowerCase() === username.toLowerCase())) {
-      reject("Username already exists");
-      return;
-    }
-
-    const newCustomerId = accounts.length > 0 ? Math.max(...accounts.map((a) => a.CustomerID)) + 1 : 1;
-    const account = {
-      CustomerID: newCustomerId,
-      username,
-      password,
-      email: accountData.email || "",
-      name: accountData.name || ""
-    };
-
-    accounts.push(account);
-    fs.writeFile("./data/accounts.json", JSON.stringify(accounts, null, 2), (err) => {
-      if (err) {
-        reject("Unable to save account");
-        return;
-      }
-      resolve(account);
-    });
-  });
-};
-
-module.exports.checkLogin = function (username, password) {
-  return new Promise((resolve, reject) => {
-    const account = accounts.find(
-      (a) => a.username.toLowerCase() === (username || "").toLowerCase() && a.password === password
-    );
-    if (!account) {
-      reject("Invalid username or password");
-      return;
-    }
-    resolve(account);
   });
 };
 
