@@ -1,19 +1,20 @@
-   [
- {
-      "employeeNum": 1,
-      "firstName": "Foster",
-      "lastName": "Thorburn",
-      "email": "fthorburn0@myCompany.com",
-      "SSN": "935-74-9919",
-      "addressStreet": "8 Arapahoe Park",
-      "addressCity": "New York",
-      "addressState": "NY",
-      "addressPostal": "20719",
-      "maritalStatus": "single",
-      "isManager": true,
-      "employeeManagerNum": null,
-      "status": "Full Time",
-      "department": 2,
-      "hireDate": "4/30/2014"
-    }
-   ]
+[
+  {
+    "CustomerID": 1,
+    "Name": "Jason Reed",
+    "Email": "jason.reed@example.com",
+    "PhoneNumber": "555-123-4567"
+  },
+  {
+    "CustomerID": 2,
+    "Name": "Ava Martinez",
+    "Email": "ava.martinez@example.com",
+    "PhoneNumber": "555-234-5678"
+  },
+  {
+    "CustomerID": 3,
+    "Name": "Nina Brooks",
+    "Email": "nina.brooks@example.com",
+    "PhoneNumber": "555-345-6789"
+  }
+]

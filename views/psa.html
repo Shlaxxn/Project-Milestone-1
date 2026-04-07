@@ -50,7 +50,7 @@
       <div class="row">
         
         <div class="psa-table">
-          <h2>PSA Orders</h2>
+          <h2>Your Orders</h2>
         <table>
             <thead>
               <tr>
@@ -59,29 +59,85 @@
                 <th>Date Updated</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>12345</td>
-                <td>Shipped</td>
-                <td>01-01-2026</td>
-              </tr>
-              <tr>
-                <td>12364</td>
-                <td>Waiting</td>
-                <td>02-01-2026</td>
-              </tr>
-            </tbody>
+            <tbody id="psaTableBody"></tbody>
           </table>
-          <caption>There will be more added when JS is added here</caption>
         </div>
 
         
       </div>
     </div>
-     <footer>
+   <footer>
+      <div class="footer-logo">
         <img class="logo-img" id="navbar-logo" src="images/logo.jpg">
+      </div>
+      <div class="footer-name">
         <span class="footer">AA Cards and Collectibles</span>
+      </div>
+      <div class="social-links">
+          <a href="https://www.facebook.com/share/1B6prTw5yZ/?mibextid=wwXIfr" target="_blank">
+          <i class="fab fa-facebook"></i>
+          </a>
+          <a href="https://www.instagram.com/aacardssports?igsh=MWMxNmp5MTRrY2xzNw==" target="_blank">
+          <i class="fab fa-instagram"></i>
+          </a>
+      </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+
+        <script>
+      const params = new URLSearchParams(window.location.search);
+      const customerIdFromUrl = params.get("customerId");
+      let activeCustomerId = customerIdFromUrl || localStorage.getItem("activeCustomerId");
+
+      if (customerIdFromUrl) {
+        localStorage.setItem("activeCustomerId", customerIdFromUrl);
+      }
+      if (!activeCustomerId) {
+        window.location.href = "/login";
+      }
+
+      fetch("/data/orders.json")
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to load order data");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          const tableBody = document.getElementById("psaTableBody");
+          const customerOrders = data.filter(
+            (order) => String(order.CustomerID) === String(activeCustomerId)
+          );
+
+          if (customerOrders.length === 0) {
+            const row = document.createElement("tr");
+            row.innerHTML = '<td colspan="3">No orders found for this account.</td>';
+            tableBody.appendChild(row);
+            return;
+          }
+
+          customerOrders.forEach((order) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${order.OrderID}</td>
+              <td>${order.Status}</td>
+              <td>${order.date || ""}</td>
+            `;
+            tableBody.appendChild(row);
+          });
+        })
+        .catch((error) => {
+          console.error("Error loading JSON:", error);
+          const tableBody = document.getElementById("psaTableBody");
+          if (tableBody) {
+            const row = document.createElement("tr");
+            row.innerHTML = '<td colspan="3">Unable to load order data.</td>';
+            tableBody.appendChild(row);
+          }
+        });
+    </script>
   </body>
 </html>
+
+

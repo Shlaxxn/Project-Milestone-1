@@ -3,49 +3,7 @@ const fs = require("fs");
 let shipments = [];
 let orders = [];
 let customers = [];
-
-var mongoose = require("mongoose");
-var Schema = mongoose.Schema;
-
-let db = mongoose.createConnection("mongodb+srv://aacardscalendar_db_user:<jODVZR0QxpGBmk4N>@aacardscluster.22qy1qa.mongodb.net/?appName=AACardsCluster");
-
-db.on('error', (err)=>{
-console.log("db1 error!");
-});
-db.once('open', ()=>{
-console.log("db1 success!");
-});
-
-var shipmentSchema = new Schema({
-"ShipmentID": Number,
-"Status": String,
-"Order Count": {type: Number, default: 0}
-});
-
-var orderSchema = new Schema({
-"OrderID": Number,
-"CustomerID": Number,
-"Card Count": Number,
-"Status": String
-});
-
-var customerSchema = new Schema({
-"CustomerID": Number,
-"Name": String,
-"Email": String,
-"PhoneNumber": String
-});
-
-var shipmentorderSchema = new Schema({
-"ShipmentID": Number,
-"OrderID": Number
-});
-
-var Shipment = mongoose.model("Shipment", shipmentSchema);
-var Order = mongoose.model("Order", orderSchema);
-var Customer = mongoose.model("Customer", customerSchema);
-var ShipmentOrder = mongoose.model("ShipmentOrder", shipmentorderSchema);
-
+let accounts = [];
 
 module.exports.initialize = function () {
   return new Promise((resolve, reject) => {
@@ -54,7 +12,6 @@ module.exports.initialize = function () {
       if (!text || text.trim() === "") return [];
       return JSON.parse(text);
     };
-
     fs.readFile("./data/shipments.json", "utf8", (err, data) => {
       if (err) {
         reject("Unable to read the file: shipments.json");
@@ -66,7 +23,6 @@ module.exports.initialize = function () {
         reject("Invalid JSON in shipments.json");
         return;
       }
-
       fs.readFile("./data/customers.json", "utf8", (err, data) => {
         if (err) {
           reject("Unable to read the file: customers.json");
@@ -91,10 +47,79 @@ module.exports.initialize = function () {
             return;
           }
 
-          resolve();
+          fs.readFile("./data/accounts.json", "utf8", (err, data) => {
+            if (err) {
+              if (err.code === "ENOENT") {
+                accounts = [];
+                resolve();
+                return;
+              }
+              reject("Unable to read the file: accounts.json");
+              return;
+            }
+            try {
+              accounts = safeParse(data);
+            } catch (e) {
+              reject("Invalid JSON in accounts.json");
+              return;
+            }
+            resolve();
+          });
         });
       });
     });
+  });
+};
+
+module.exports.addAccount = function (accountData) {
+  return new Promise((resolve, reject) => {
+    const username = (accountData.username || "").trim();
+    const password = accountData.password || "";
+    const passwordconfirm = accountData.passwordconfirm || "";
+
+    if (!username || !password || !passwordconfirm) {
+      reject("Username and password are required");
+      return;
+    }
+    if (password !== passwordconfirm) {
+      reject("Passwords do not match");
+      return;
+    }
+    if (accounts.find((a) => a.username.toLowerCase() === username.toLowerCase())) {
+      reject("Username already exists");
+      return;
+    }
+
+    const newCustomerId = accounts.length > 0 ? Math.max(...accounts.map((a) => a.CustomerID)) + 1 : 1;
+    const account = {
+      CustomerID: newCustomerId,
+      username,
+      password,
+      email: accountData.email || "",
+      name: accountData.name || ""
+    };
+
+    accounts.push(account);
+    fs.writeFile("./data/accounts.json", JSON.stringify(accounts, null, 2), (err) => {
+      if (err) {
+        reject("Unable to save account");
+        return;
+      }
+      resolve(account);
+    });
+  });
+};
+
+module.exports.checkLogin = function (username, password) {
+  return new Promise((resolve, reject) => {
+    const account = accounts.find(
+      (a) => a.username.toLowerCase() === (username || "").toLowerCase() && a.password === password
+    );
+    if (!account) {
+      reject("Invalid username or password");
+      return;
+    }
+    resolve(account);
   });
 };
 

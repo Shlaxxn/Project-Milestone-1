@@ -46,7 +46,7 @@
 
     <!-- Main Content -->
         <div class="loginContainer">
-          <form action="/action_page.php" method="post" class="loginForm" style="background-color: #2a5496">
+          <form action="/createaccount" method="post" class="loginForm" style="background-color: #2a5496">
             <table style="border:1px dashed #cdcdcd;padding:6px;" >
             <tbody>
             <tr>
@@ -54,27 +54,29 @@
             <label for="username">Choose a username:</label>
             </td>
             <td>
-            <input style="width:100%" id="username" type="text" placeholder="Username">
+            <input style="width:100%" id="username" name="username" type="text" placeholder="Username" required>
             </td>
             </tr>
+            <tr>
             <td>
             <label for="email">Enter your Email:</label>
             </td>
-            <td><input style="width:100%" id="email" type="text" placeholder="email"> </td>
+            <td><input style="width:100%" id="email" name="email" type="email" placeholder="email@example.com" required> </td>
+            </tr>
             <tr>
             <td><label for ="name"> Your Name: </label></td>
-            <td><input style="width:100%" id="name" type="text" placeholder="name"> </td>
+            <td><input style="width:100%" id="name" name="name" type="text" placeholder="Name" required> </td>
             </tr>
             <tr>
             <td><label for ="password"> Your Password: </label></td>
-            <td><input style="width:100%" id="password" type="text" placeholder="password"> </td>
+            <td><input style="width:100%" id="password" name="password" type="password" placeholder="Password" required> </td>
             </tr>
             <tr>
             <td><label for ="passwordconfirm"> Confirm Password: </label></td>
-            <td><input style="width:100%" id="passwordconfirm" type="password"> </td>
+            <td><input style="width:100%" id="passwordconfirm" name="passwordconfirm" type="password" required> </td>
             </tr>
             <tr>
-            <td colspan= "2"><input type="submit" value="Submit">
+            <td colspan="2"><input type="submit" value="Submit"></td>
             </tr>
             </tbody>
             </table>

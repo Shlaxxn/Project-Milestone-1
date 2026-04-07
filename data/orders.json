@@ -1,19 +1,30 @@
 [
-    {
-      "employeeNum": 1,
-      "firstName": "Foster",
-      "lastName": "Thorburn",
-      "email": "fthorburn0@myCompany.com",
-      "SSN": "935-74-9919",
-      "addressStreet": "8 Arapahoe Park",
-      "addressCity": "New York",
-      "addressState": "NY",
-      "addressPostal": "20719",
-      "maritalStatus": "single",
-      "isManager": true,
-      "employeeManagerNum": null,
-      "status": "Full Time",
-      "department": 2,
-      "hireDate": "4/30/2014"
-    }
+  {
+    "OrderID": 101,
+    "CustomerID": 1,
+    "Card Count": 5,
+    "Status": "Pending",
+    "date": "2024-06-01"
+  },
+  {
+    "OrderID": 102,
+    "CustomerID": 2,
+    "Card Count": 8,
+    "Status": "Processing",
+    "date": "2024-06-02"
+  },
+  {
+    "OrderID": 103,
+    "CustomerID": 3,
+    "Card Count": 3,
+    "Status": "Delivered",
+    "date": "2024-06-03"
+  },
+  {
+    "OrderID": 104,
+    "CustomerID": 1,
+    "Card Count": 2,
+    "Status": "Shipped",
+    "date": "2024-06-04"
+  }
 ]
