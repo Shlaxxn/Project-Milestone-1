@@ -72,6 +72,12 @@ th, td {
   text-align: center;
   margin-top: 200px;
   margin-bottom: auto;
+  padding: 0 20px;
+}
+.greating h1,
+.greating h2 {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .about {
   color:white;
@@ -193,10 +199,24 @@ footer{
     padding: 5px;
   }
   
-  .greeting {
-    margin-top: 100px;
+  .greating {
+    margin-top: 80px;
+  }
+
+  .greating h1 {
+    font-size: 48px !important;
+  }
+
+  .greating h2 {
+    font-size: 32px !important;
   }
   
+  .inside {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+  }
+
   footer {
     flex-direction: column;
     height: auto;
@@ -237,6 +257,18 @@ footer{
     display: block;
   }
   
+  .greating {
+    margin-top: 60px;
+  }
+
+  .greating h1 {
+    font-size: 32px !important;
+  }
+
+  .greating h2 {
+    font-size: 22px !important;
+  }
+
   .banner {
     padding: 5px 0;
   }
