@@ -163,3 +163,90 @@ footer{
   flex: 1;
   text-align: left;
 }
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .nav {
+    padding: 0px 10px;
+    height: 80px;
+  }
+  
+  .logo-img {
+    height: 50px;
+    padding: 5px;
+  }
+  
+  .loginContainer {
+    padding: 10px;
+  }
+  
+  .loginForm {
+    padding: 15px;
+    gap: 10px;
+  }
+  
+  table {
+    font-size: 14px;
+  }
+  
+  th, td {
+    padding: 5px;
+  }
+  
+  .greeting {
+    margin-top: 100px;
+  }
+  
+  footer {
+    flex-direction: column;
+    height: auto;
+    text-align: center;
+  }
+  
+  .social-links {
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .footer-name {
+    margin: 10px 0;
+  }
+  
+  .footer-logo {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    padding: 0px 5px;
+    height: 60px;
+  }
+  
+  .logo-img {
+    height: 40px;
+  }
+  
+  .loginForm {
+    padding: 10px;
+  }
+  
+  table {
+    font-size: 12px;
+    overflow-x: auto;
+    display: block;
+  }
+  
+  .banner {
+    padding: 5px 0;
+  }
+  
+  footer {
+    padding: 5px;
+  }
+  
+  .social-links a {
+    font-size: 30px;
+    margin-right: 5px;
+  }
+}
