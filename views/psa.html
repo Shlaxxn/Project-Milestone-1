@@ -51,11 +51,13 @@
         
         <div class="psa-table">
           <h2>Your Orders</h2>
-        <table>
+        <table class="table table-striped">
             <thead>
               <tr>
                 <th>Order ID</th>
-                <th>Status</th>
+                <th>Card Count</th>
+                <th>Order Status</th>
+                <th>Shipment Status</th>
                 <th>Date Shipped</th>
               </tr>
             </thead>
@@ -98,32 +100,31 @@
         window.location.href = "/login";
       }
 
-      fetch("/data/orders.json")
+      fetch(`/customer-orders?customerId=${encodeURIComponent(activeCustomerId)}`)
         .then((response) => {
           if (!response.ok) {
             throw new Error("Failed to load order data");
           }
           return response.json();
         })
-        .then((data) => {
+        .then((orders) => {
           const tableBody = document.getElementById("psaTableBody");
-          const customerOrders = data.filter(
-            (order) => String(order.CustomerID) === String(activeCustomerId)
-          );
 
-          if (customerOrders.length === 0) {
+          if (orders.length === 0) {
             const row = document.createElement("tr");
-            row.innerHTML = '<td colspan="3">No orders found for this account.</td>';
+            row.innerHTML = '<td colspan="5">No orders found for this account.</td>';
             tableBody.appendChild(row);
             return;
           }
 
-          customerOrders.forEach((order) => {
+          orders.forEach((order) => {
             const row = document.createElement("tr");
             row.innerHTML = `
               <td>${order.OrderID}</td>
-              <td>${order.Status}</td>
-              <td>${order.shippedDate || order.date || ""}</td>
+              <td>${order.cardCount || ""}</td>
+              <td>${order.orderStatus || ""}</td>
+              <td>${order.shipmentStatus || "Not Assigned"}</td>
+              <td>${order.dateShipped ? new Date(order.dateShipped).toLocaleDateString() : ""}</td>
             `;
             tableBody.appendChild(row);
           });
