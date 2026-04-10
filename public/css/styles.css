@@ -72,6 +72,12 @@ th, td {
   text-align: center;
   margin-top: 200px;
   margin-bottom: auto;
+  padding: 0 20px;
+}
+.greating h1,
+.greating h2 {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .about {
   color:white;
@@ -162,4 +168,153 @@ footer{
 .footer-logo {
   flex: 1;
   text-align: left;
+}
+
+/* Left-side drawer nav on mobile */
+@media (max-width: 991.98px) {
+  #navbarNav {
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 280px;
+    height: 100vh;
+    background-color: #2a5496;
+    z-index: 1050;
+    padding-top: 80px;
+    transition: right 0.3s ease;
+    display: block !important;
+  }
+
+  #navbarNav.show {
+    right: 0;
+  }
+
+  #navbarNav.collapsing {
+    height: 100vh !important;
+    right: -280px;
+    transition: right 0.3s ease !important;
+  }
+
+  .navbar-nav {
+    flex-direction: column !important;
+    padding: 10px;
+  }
+
+  .nav-link {
+    padding: 12px 16px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .nav {
+    padding: 0px 10px;
+    height: 80px;
+  }
+  
+  .logo-img {
+    height: 50px;
+    padding: 5px;
+  }
+  
+  .loginContainer {
+    padding: 10px;
+  }
+  
+  .loginForm {
+    padding: 15px;
+    gap: 10px;
+  }
+  
+  table {
+    font-size: 14px;
+  }
+  
+  th, td {
+    padding: 5px;
+  }
+  
+  .greating {
+    margin-top: 80px;
+  }
+
+  .greating h1 {
+    font-size: 48px !important;
+  }
+
+  .greating h2 {
+    font-size: 32px !important;
+  }
+  
+  .inside {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  footer {
+    flex-direction: column;
+    height: auto;
+    text-align: center;
+  }
+  
+  .social-links {
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .footer-name {
+    margin: 10px 0;
+  }
+  
+  .footer-logo {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    padding: 0px 5px;
+    height: 60px;
+  }
+  
+  .logo-img {
+    height: 40px;
+  }
+  
+  .loginForm {
+    padding: 10px;
+  }
+  
+  table {
+    font-size: 12px;
+    overflow-x: auto;
+    display: block;
+  }
+  
+  .greating {
+    margin-top: 60px;
+  }
+
+  .greating h1 {
+    font-size: 32px !important;
+  }
+
+  .greating h2 {
+    font-size: 22px !important;
+  }
+
+  .banner {
+    padding: 5px 0;
+  }
+  
+  footer {
+    padding: 5px;
+  }
+  
+  .social-links a {
+    font-size: 30px;
+    margin-right: 5px;
+  }
 }

@@ -1,0 +1,20 @@
+[
+  {
+    "CustomerID": 1,
+    "Name": "Jason Reed",
+    "Email": "jason.reed@example.com",
+    "PhoneNumber": "555-123-4567"
+  },
+  {
+    "CustomerID": 2,
+    "Name": "Ava Martinez",
+    "Email": "ava.martinez@example.com",
+    "PhoneNumber": "555-234-5678"
+  },
+  {
+    "CustomerID": 3,
+    "Name": "Nina Brooks",
+    "Email": "nina.brooks@example.com",
+    "PhoneNumber": "555-345-6789"
+  }
+]
