@@ -39,8 +39,11 @@
             <li class="nav-item">
               <a class="nav-link active" href="/psa">PSA Tracking</a>
             </li>
-             <li class="nav-item">
+            <li class="nav-item">
               <a class="nav-link " href="/login">Login</a>
+            </li>
+            <li class="nav-item" id="customerIdNavItem" style="display: none;">
+              <span class="nav-link" id="customerIdDisplay"></span>
             </li>
           </ul>
         </div>
@@ -53,17 +56,32 @@
         
         <div class="psa-table">
           <h2>Your Orders</h2>
+          {{#if error}}
+            <div class="alert alert-danger">{{error}}</div>
+          {{/if}}
         <table class="table table-striped">
             <thead>
               <tr>
                 <th>Order ID</th>
                 <th>Card Count</th>
-                <th>Order Status</th>
                 <th>Shipment Status</th>
                 <th>Date Shipped</th>
               </tr>
             </thead>
-            <tbody id="psaTableBody"></tbody>
+            <tbody>
+              {{#each orders}}
+              <tr>
+                <td>{{this.OrderID}}</td>
+                <td>{{this.cardCount}}</td>
+                <td>{{this.shipmentStatus}}</td>
+                <td>{{#if this.dateShipped}}{{formatDate this.dateShipped}}{{/if}}</td>
+              </tr>
+              {{else}}
+              <tr>
+                <td colspan="4">No orders found for this account.</td>
+              </tr>
+              {{/each}}
+            </tbody>
           </table>
         </div>
 
@@ -88,60 +106,26 @@
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/nav.js"></script>
+    <script>
+      // Handle customer ID persistence with localStorage
+      (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCustomerId = urlParams.get('customerId');
+        const storedCustomerId = localStorage.getItem('customerId');
+        const customerId = urlCustomerId || storedCustomerId;
 
+        if (customerId) {
+          localStorage.setItem('customerId', customerId);
+          document.getElementById('customerIdDisplay').textContent = 'Customer ID: ' + customerId;
+          document.getElementById('customerIdNavItem').style.display = '';
 
-        <script>
-      const params = new URLSearchParams(window.location.search);
-      const customerIdFromUrl = params.get("customerId");
-      let activeCustomerId = customerIdFromUrl || localStorage.getItem("activeCustomerId");
-
-      if (customerIdFromUrl) {
-        localStorage.setItem("activeCustomerId", customerIdFromUrl);
-      }
-      if (!activeCustomerId) {
-        window.location.href = "/login";
-      }
-
-      fetch(`/customer-orders?customerId=${encodeURIComponent(activeCustomerId)}`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to load order data");
+          if (urlCustomerId && window.location.search !== '') {
+            window.history.replaceState({}, document.title, '/psa');
           }
-          return response.json();
-        })
-        .then((orders) => {
-          const tableBody = document.getElementById("psaTableBody");
-
-          if (orders.length === 0) {
-            const row = document.createElement("tr");
-            row.innerHTML = '<td colspan="5">No orders found for this account.</td>';
-            tableBody.appendChild(row);
-            return;
-          }
-
-          orders.forEach((order) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-              <td>${order.OrderID}</td>
-              <td>${order.cardCount || ""}</td>
-              <td>${order.orderStatus || ""}</td>
-              <td>${order.shipmentStatus || "Not Assigned"}</td>
-              <td>${order.dateShipped ? new Date(order.dateShipped).toLocaleDateString() : ""}</td>
-            `;
-            tableBody.appendChild(row);
-          });
-        })
-        .catch((error) => {
-          console.error("Error loading JSON:", error);
-          const tableBody = document.getElementById("psaTableBody");
-          if (tableBody) {
-            const row = document.createElement("tr");
-            row.innerHTML = '<td colspan="3">Unable to load order data.</td>';
-            tableBody.appendChild(row);
-          }
-        });
+        } else {
+          window.location.href = '/login';
+        }
+      })();
     </script>
   </body>
 </html>
-
-

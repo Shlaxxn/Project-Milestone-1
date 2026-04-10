@@ -46,6 +46,9 @@
         <!-- Create Shipment Form -->
         <div class="shipment-form-section mb-5">
           <h2>Create Order</h2>
+          {{#if error}}
+            <div class="alert alert-danger">{{error}}</div>
+          {{/if}}
           <form id="shipmentForm" action="/createorder" method="POST">
             <div class="form-group mb-3">
               <label for="customerName">Customer Name:</label>
@@ -56,6 +59,12 @@
               <label for="shipmentId">Assign Pending Shipment:</label>
               <select id="shipmentId" name="shipmentId" class="form-control">
                 <option value="">-- Select a pending shipment (optional) --</option>
+                {{#each pendingShipments}}
+                <option value="{{this.ShipmentID}}">Shipment {{this.ShipmentID}}</option>
+                {{/each}}
+                {{#unless pendingShipments.length}}
+                <option value="">No pending shipments available</option>
+                {{/unless}}
               </select>
               <small class="form-text text-muted">Choose a pending shipment to attach this order to the shipment.</small>
             </div>
@@ -73,41 +82,5 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/nav.js"></script>
-    <script>
-      async function loadPendingShipments() {
-        const shipmentSelect = document.getElementById('shipmentId');
-
-        try {
-          const response = await fetch('/pending-shipments');
-          if (!response.ok) {
-            throw new Error('Failed to load pending shipments');
-          }
-          const shipments = await response.json();
-
-          shipments.forEach((shipment) => {
-            const option = document.createElement('option');
-            option.value = shipment.ShipmentID;
-            option.textContent = `Shipment ${shipment.ShipmentID}`;
-            shipmentSelect.appendChild(option);
-          });
-
-          if (shipments.length === 0) {
-            const option = document.createElement('option');
-            option.value = '';
-            option.textContent = 'No pending shipments available';
-            shipmentSelect.appendChild(option);
-            shipmentSelect.disabled = true;
-          }
-        } catch (err) {
-          const option = document.createElement('option');
-          option.value = '';
-          option.textContent = 'Unable to load pending shipments';
-          shipmentSelect.appendChild(option);
-          shipmentSelect.disabled = true;
-        }
-      }
-
-      loadPendingShipments();
-    </script>
   </body>
 </html>
