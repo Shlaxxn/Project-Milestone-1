@@ -142,8 +142,8 @@ app.get("/psa", async (req, res) => {
   if (customerId && Number(customerId) === 1) {
     return res.redirect("/employeepsa");
   }
-
-  if (!customerId) {
+//********************FIX THIS********************
+  if (!customerId) { //This is why we need login sessions, but for now just redirect to login if no customerId is provided
     return res.redirect("/login");
   }
 
