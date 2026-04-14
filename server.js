@@ -381,6 +381,61 @@ app.post("/employeepsa", async (req, res) => {
   }
 });
 
+app.get("/employee-search", async (req, res) => {
+  const query = req.query.name ? req.query.name.trim() : '';
+
+  if (!query) {
+    return res.render('employeesearch', { query: '', customers: null });
+  }
+
+  try {
+    const customers = await Customer.find({
+      Name: { $regex: query, $options: 'i' }
+    }).lean();
+
+    if (customers.length === 0) {
+      return res.render('employeesearch', { query, customers: [] });
+    }
+
+    const customerIds = customers.map(c => c.CustomerID);
+    const orders = await Order.find({ CustomerID: { $in: customerIds } }).lean();
+    const orderIds = orders.map(o => o.OrderID);
+    const shipmentLinks = await ShipmentOrder.find({ OrderID: { $in: orderIds } }).lean();
+    const shipmentIds = shipmentLinks.map(l => l.ShipmentID);
+    const shipments = await Shipment.find({ ShipmentID: { $in: shipmentIds } }).lean();
+
+    const shipmentById = shipments.reduce((acc, s) => { acc[s.ShipmentID] = s; return acc; }, {});
+    const shipmentByOrderId = shipmentLinks.reduce((acc, l) => { acc[l.OrderID] = l.ShipmentID; return acc; }, {});
+
+    const ordersByCustomer = orders.reduce((acc, order) => {
+      const shipmentId = shipmentByOrderId[order.OrderID];
+      const shipment = shipmentById[shipmentId];
+      if (!acc[order.CustomerID]) acc[order.CustomerID] = [];
+      acc[order.CustomerID].push({
+        OrderID: order.OrderID,
+        cardCount: order["Card Count"],
+        date: order.Date,
+        shipmentStatus: shipment ? shipment.Status : "Not Assigned",
+        dateShipped: shipment ? shipment.DateShipped : null
+      });
+      return acc;
+    }, {});
+
+    const results = customers.map(c => ({
+      CustomerID: c.CustomerID,
+      Name: c.Name,
+      username: c.username,
+      Email: c.Email,
+      orders: ordersByCustomer[c.CustomerID] || []
+    }));
+
+    res.render('employeesearch', { query, customers: results });
+  } catch (err) {
+    console.log(err);
+    res.render('employeesearch', { query, customers: [], error: 'Search failed' });
+  }
+});
+
 app.get("/createshipment", (req, res) => {
   res.render('createshipment');
 });
