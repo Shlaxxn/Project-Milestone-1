@@ -7,8 +7,7 @@ const fs = require("fs");
 const multer = require("multer");
 const mongoose = require("mongoose");
 const exphbs = require("express-handlebars");
-// const session = require("express-session");
-// Session support requires: npm install express-session
+const session = require("express-session");
 
 const app = express();
 dotenv.config();
@@ -31,13 +30,13 @@ app.set('views', path.join(__dirname, 'views'));
 // set HTTP_PORT
 const HTTP_PORT = process.env.PORT || 8080;
 
-// Session middleware - uncomment after: npm install express-session
-// app.use(session({
-//   secret: process.env.SESSION_SECRET || 'your-secret-key',
-//   resave: false,
-//   saveUninitialized: true,
-//   cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
-// }));
+// Session middleware — keeps customers logged in for 24 hours
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+}));
 
 // parse form and JSON bodies
 app.use(express.urlencoded({ extended: true }));
@@ -137,18 +136,18 @@ app.get("/calender", (req, res) => {
 
 // PSA route
 app.get("/psa", async (req, res) => {
-  const customerId = req.query.customerId;
+  const customerId = req.session.customerId;
 
-  if (customerId && Number(customerId) === 1) {
-    return res.redirect("/employeepsa");
-  }
-//********************FIX THIS********************
-  if (!customerId) { //This is why we need login sessions, but for now just redirect to login if no customerId is provided
+  if (!customerId) {
     return res.redirect("/login");
   }
 
+  if (customerId === 1) {
+    return res.redirect("/employeepsa");
+  }
+
   try {
-    const orders = await Order.find({ CustomerID: parseInt(customerId, 10) }).lean();
+    const orders = await Order.find({ CustomerID: customerId }).lean();
     const orderIds = orders.map((order) => order.OrderID);
     const shipmentLinks = await ShipmentOrder.find({ OrderID: { $in: orderIds } }).lean();
     const shipmentIds = shipmentLinks.map((link) => link.ShipmentID);
@@ -184,10 +183,10 @@ app.get("/psa", async (req, res) => {
 });
 
 app.get("/customer-orders", async (req, res) => {
-  const customerId = parseInt(req.query.customerId, 10);
+  const customerId = req.session.customerId;
 
   if (!customerId) {
-    return res.status(400).json({ error: "customerId is required" });
+    return res.status(401).json({ error: "Not logged in" });
   }
 
   try {
@@ -238,7 +237,8 @@ app.post("/login", async (req, res) => {
 
   try {
     const account = await checkLogin(username, password);
-    res.redirect(`/psa?customerId=${account.CustomerID}`);
+    req.session.customerId = account.CustomerID;
+    res.redirect("/psa");
   } catch (err) {
     res.redirect("/login?error=invalid");
   }
@@ -271,7 +271,8 @@ app.post("/createaccount", async (req, res) => {
     });
 
     const savedCustomer = await newCustomer.save();
-    res.redirect(`/psa?customerId=${savedCustomer.CustomerID}`);
+    req.session.customerId = savedCustomer.CustomerID;
+    res.redirect("/psa");
   } catch (err) {
     res.redirect(`/accountcreation?error=${encodeURIComponent(err.message || err)}`);
   }
@@ -466,8 +467,9 @@ app.post("/createorder", async (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
-  // Client-side will clear localStorage via the logout link script
-  res.redirect("/login");
+  req.session.destroy(() => {
+    res.redirect("/login");
+  });
 });
 
 // run "node server.js" to start the setup server
