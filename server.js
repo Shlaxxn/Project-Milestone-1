@@ -38,6 +38,12 @@ app.use(session({
   cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
 }));
 
+// Make login state available to all templates
+app.use((req, res, next) => {
+  res.locals.loggedIn = !!req.session.customerId;
+  next();
+});
+
 // parse form and JSON bodies
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
