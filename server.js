@@ -32,6 +32,9 @@ app.set('views', path.join(__dirname, 'views'));
 // set HTTP_PORT
 const HTTP_PORT = process.env.PORT || 8080;
 
+// Trust Render/Heroku/etc reverse proxy so secure cookies work over HTTPS
+app.set('trust proxy', 1);
+
 // Fail fast if SESSION_SECRET is not set
 if (!process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET environment variable must be set in .env");
