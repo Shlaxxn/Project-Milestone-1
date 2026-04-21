@@ -504,8 +504,10 @@ app.post("/createshipment", requireEmployee, async (req, res) => {
 
 app.get("/createorder", requireEmployee, async (req, res) => {
   try {
+    const confirmation = req.session.orderConfirmation || null;
+    delete req.session.orderConfirmation;
     const pendingShipments = await Shipment.find({ Status: "Pending" }).select("ShipmentID").lean();
-    res.render('createorder', { pendingShipments });
+    res.render('createorder', { pendingShipments, confirmation });
   } catch (err) {
     console.log(err);
     res.render('createorder', { pendingShipments: [], error: 'Unable to load shipments' });
@@ -564,6 +566,13 @@ app.post("/createorder", requireEmployee, async (req, res) => {
         { $inc: { "Order Count": 1 } }
       );
     }
+
+    req.session.orderConfirmation = {
+      orderID: newOrder.OrderID,
+      customer,
+      cardCount: cardCountNumber,
+      shipmentID: shipmentId ? parseInt(shipmentId, 10) : null
+    };
 
     res.redirect("/createorder");
   } catch (err) {
