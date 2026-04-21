@@ -52,6 +52,20 @@
         <!-- Create Shipment Form -->
         <div class="shipment-form-section mb-5">
           <h2>Create Order</h2>
+          {{#if confirmation}}
+            <div class="alert alert-success">
+              <strong>Order #{{confirmation.orderID}} created successfully.</strong>
+              <ul class="mb-0 mt-2">
+                <li>Customer: {{confirmation.customer}}</li>
+                <li>Card Count: {{confirmation.cardCount}}</li>
+                {{#if confirmation.shipmentID}}
+                  <li>Assigned to Shipment #{{confirmation.shipmentID}}</li>
+                {{else}}
+                  <li>No shipment assigned</li>
+                {{/if}}
+              </ul>
+            </div>
+          {{/if}}
           {{#if error}}
             <div class="alert alert-danger">{{error}}</div>
           {{/if}}
