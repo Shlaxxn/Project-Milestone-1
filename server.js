@@ -7,8 +7,9 @@ const fs = require("fs");
 const multer = require("multer");
 const mongoose = require("mongoose");
 const exphbs = require("express-handlebars");
-// const session = require("express-session");
-// Session support requires: npm install express-session
+const session = require("express-session");
+const bcrypt = require("bcryptjs");
+const { rateLimit } = require("express-rate-limit");
 
 const app = express();
 dotenv.config();
@@ -31,13 +32,29 @@ app.set('views', path.join(__dirname, 'views'));
 // set HTTP_PORT
 const HTTP_PORT = process.env.PORT || 8080;
 
-// Session middleware - uncomment after: npm install express-session
-// app.use(session({
-//   secret: process.env.SESSION_SECRET || 'your-secret-key',
-//   resave: false,
-//   saveUninitialized: true,
-//   cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
-// }));
+// Fail fast if SESSION_SECRET is not set
+if (!process.env.SESSION_SECRET) {
+  throw new Error("SESSION_SECRET environment variable must be set in .env");
+}
+
+// Session middleware — keeps customers logged in for 24 hours
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    httpOnly: true,               // JS cannot read the cookie
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
+    sameSite: 'lax'              // blocks cross-site POST (CSRF mitigation)
+  }
+}));
+
+// Make login state available to all templates
+app.use((req, res, next) => {
+  res.locals.loggedIn = !!req.session.customerId;
+  next();
+});
 
 // parse form and JSON bodies
 app.use(express.urlencoded({ extended: true }));
@@ -67,7 +84,7 @@ var Schema = mongoose.Schema;
 
 var shipmentSchema = new Schema({
 "ShipmentID": Number,
-"Status": String,
+"Status": { type: String, enum: ["Pending", "Shipped", "Delivered"] },
 "Order Count": {type: Number, default: 0},
 "DateShipped": Date
 });
@@ -98,11 +115,16 @@ var Customer = mongoose.model("Customer", customerSchema);
 var ShipmentOrder = mongoose.model("ShipmentOrder", shipmentorderSchema);
 
 async function checkLogin(username, password) {
-  const account = await Customer.findOne({ username, Password: password })
-    .select("CustomerID")
+  const account = await Customer.findOne({ username })
+    .select("CustomerID Password")
     .lean();
 
   if (!account) {
+    throw new Error("Invalid login credentials");
+  }
+
+  const match = await bcrypt.compare(password, account.Password);
+  if (!match) {
     throw new Error("Invalid login credentials");
   }
 
@@ -123,6 +145,23 @@ async function getNextShipmentId() {
   return lastShipment ? lastShipment.ShipmentID + 1 : 1;
 }
 
+// Middleware: employee-only routes
+function requireEmployee(req, res, next) {
+  if (req.session.customerId !== 1) {
+    return res.redirect("/login");
+  }
+  next();
+}
+
+// Rate limiter: max 10 login attempts per 15 minutes per IP
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Too many login attempts. Please try again in 15 minutes.'
+});
+
 //ROUTES BELOW
 
 // home route
@@ -137,18 +176,18 @@ app.get("/calender", (req, res) => {
 
 // PSA route
 app.get("/psa", async (req, res) => {
-  const customerId = req.query.customerId;
+  const customerId = req.session.customerId;
 
-  if (customerId && Number(customerId) === 1) {
-    return res.redirect("/employeepsa");
-  }
-//********************FIX THIS********************
-  if (!customerId) { //This is why we need login sessions, but for now just redirect to login if no customerId is provided
+  if (!customerId) {
     return res.redirect("/login");
   }
 
+  if (customerId === 1) {
+    return res.redirect("/employeepsa");
+  }
+
   try {
-    const orders = await Order.find({ CustomerID: parseInt(customerId, 10) }).lean();
+    const orders = await Order.find({ CustomerID: customerId }).lean();
     const orderIds = orders.map((order) => order.OrderID);
     const shipmentLinks = await ShipmentOrder.find({ OrderID: { $in: orderIds } }).lean();
     const shipmentIds = shipmentLinks.map((link) => link.ShipmentID);
@@ -184,10 +223,10 @@ app.get("/psa", async (req, res) => {
 });
 
 app.get("/customer-orders", async (req, res) => {
-  const customerId = parseInt(req.query.customerId, 10);
+  const customerId = req.session.customerId;
 
   if (!customerId) {
-    return res.status(400).json({ error: "customerId is required" });
+    return res.status(401).json({ error: "Not logged in" });
   }
 
   try {
@@ -233,12 +272,17 @@ app.get("/login", (req, res) => {
   res.render('login', { error: error === 'invalid' ? 'Invalid username or password' : null });
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", loginLimiter, async (req, res) => {
   const { username, password } = req.body;
 
   try {
     const account = await checkLogin(username, password);
-    res.redirect(`/psa?customerId=${account.CustomerID}`);
+    // Regenerate session to prevent session fixation
+    req.session.regenerate((err) => {
+      if (err) return res.redirect("/login?error=invalid");
+      req.session.customerId = account.CustomerID;
+      res.redirect("/psa");
+    });
   } catch (err) {
     res.redirect("/login?error=invalid");
   }
@@ -262,16 +306,18 @@ app.post("/createaccount", async (req, res) => {
     }
 
     const customerId = await getNextCustomerId();
+    const hashedPassword = await bcrypt.hash(password, 12);
     const newCustomer = new Customer({
       CustomerID: customerId,
       username,
       Name: name,
       Email: email,
-      Password: password
+      Password: hashedPassword
     });
 
     const savedCustomer = await newCustomer.save();
-    res.redirect(`/psa?customerId=${savedCustomer.CustomerID}`);
+    req.session.customerId = savedCustomer.CustomerID;
+    res.redirect("/psa");
   } catch (err) {
     res.redirect(`/accountcreation?error=${encodeURIComponent(err.message || err)}`);
   }
@@ -282,7 +328,7 @@ app.get("/accountcreation", (req, res) => {
   res.render('accountcreation', { error: error ? decodeURIComponent(error) : null });
 });
 
-app.get("/employeepsa", async (req, res) => {
+app.get("/employeepsa", requireEmployee, async (req, res) => {
   try {
     const shipmentId = req.query.shipmentId;
     const error = req.query.error;
@@ -341,11 +387,12 @@ app.get("/employeepsa", async (req, res) => {
   }
 });
 
-app.post("/employeepsa", async (req, res) => {
-  const { shipmentId, status, dateShipped } = req.body;
-  console.log('POST /employeepsa body:', req.body);
+const ALLOWED_STATUSES = ["Pending", "Shipped", "Delivered"];
 
-  if (!shipmentId || !status) {
+app.post("/employeepsa", requireEmployee, async (req, res) => {
+  const { shipmentId, status, dateShipped } = req.body;
+
+  if (!shipmentId || !ALLOWED_STATUSES.includes(status)) {
     return res.redirect(`/employeepsa?shipmentId=${shipmentId || ''}&error=update_failed`);
   }
 
@@ -374,11 +421,67 @@ app.post("/employeepsa", async (req, res) => {
   }
 });
 
-app.get("/createshipment", (req, res) => {
+app.get("/employee-search", requireEmployee, async (req, res) => {
+  const query = req.query.name ? req.query.name.trim() : '';
+
+  if (!query) {
+    return res.render('employeesearch', { query: '', customers: null });
+  }
+
+  try {
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const customers = await Customer.find({
+      Name: { $regex: escapedQuery, $options: 'i' }
+    }).lean();
+
+    if (customers.length === 0) {
+      return res.render('employeesearch', { query, customers: [] });
+    }
+
+    const customerIds = customers.map(c => c.CustomerID);
+    const orders = await Order.find({ CustomerID: { $in: customerIds } }).lean();
+    const orderIds = orders.map(o => o.OrderID);
+    const shipmentLinks = await ShipmentOrder.find({ OrderID: { $in: orderIds } }).lean();
+    const shipmentIds = shipmentLinks.map(l => l.ShipmentID);
+    const shipments = await Shipment.find({ ShipmentID: { $in: shipmentIds } }).lean();
+
+    const shipmentById = shipments.reduce((acc, s) => { acc[s.ShipmentID] = s; return acc; }, {});
+    const shipmentByOrderId = shipmentLinks.reduce((acc, l) => { acc[l.OrderID] = l.ShipmentID; return acc; }, {});
+
+    const ordersByCustomer = orders.reduce((acc, order) => {
+      const shipmentId = shipmentByOrderId[order.OrderID];
+      const shipment = shipmentById[shipmentId];
+      if (!acc[order.CustomerID]) acc[order.CustomerID] = [];
+      acc[order.CustomerID].push({
+        OrderID: order.OrderID,
+        cardCount: order["Card Count"],
+        date: order.Date,
+        shipmentStatus: shipment ? shipment.Status : "Not Assigned",
+        dateShipped: shipment ? shipment.DateShipped : null
+      });
+      return acc;
+    }, {});
+
+    const results = customers.map(c => ({
+      CustomerID: c.CustomerID,
+      Name: c.Name,
+      username: c.username,
+      Email: c.Email,
+      orders: ordersByCustomer[c.CustomerID] || []
+    }));
+
+    res.render('employeesearch', { query, customers: results });
+  } catch (err) {
+    console.log(err);
+    res.render('employeesearch', { query, customers: [], error: 'Search failed' });
+  }
+});
+
+app.get("/createshipment", requireEmployee, (req, res) => {
   res.render('createshipment');
 });
 
-app.post("/createshipment", async (req, res) => {
+app.post("/createshipment", requireEmployee, async (req, res) => {
   try {
     const shipmentId = await getNextShipmentId();
 
@@ -396,7 +499,7 @@ app.post("/createshipment", async (req, res) => {
   }
 });
 
-app.get("/createorder", async (req, res) => {
+app.get("/createorder", requireEmployee, async (req, res) => {
   try {
     const pendingShipments = await Shipment.find({ Status: "Pending" }).select("ShipmentID").lean();
     res.render('createorder', { pendingShipments });
@@ -406,7 +509,7 @@ app.get("/createorder", async (req, res) => {
   }
 });
 
-app.post("/createorder", async (req, res) => {
+app.post("/createorder", requireEmployee, async (req, res) => {
   try {
     const { customer, cardCount, shipmentId } = req.body;
 
@@ -466,8 +569,9 @@ app.post("/createorder", async (req, res) => {
 });
 
 app.get("/logout", (req, res) => {
-  // Client-side will clear localStorage via the logout link script
-  res.redirect("/login");
+  req.session.destroy(() => {
+    res.redirect("/login");
+  });
 });
 
 // run "node server.js" to start the setup server
