@@ -8,6 +8,8 @@ const multer = require("multer");
 const mongoose = require("mongoose");
 const exphbs = require("express-handlebars");
 const session = require("express-session");
+const bcrypt = require("bcryptjs");
+const { rateLimit } = require("express-rate-limit");
 
 const app = express();
 dotenv.config();
@@ -30,12 +32,22 @@ app.set('views', path.join(__dirname, 'views'));
 // set HTTP_PORT
 const HTTP_PORT = process.env.PORT || 8080;
 
+// Fail fast if SESSION_SECRET is not set
+if (!process.env.SESSION_SECRET) {
+  throw new Error("SESSION_SECRET environment variable must be set in .env");
+}
+
 // Session middleware — keeps customers logged in for 24 hours
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    httpOnly: true,               // JS cannot read the cookie
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
+    sameSite: 'lax'              // blocks cross-site POST (CSRF mitigation)
+  }
 }));
 
 // Make login state available to all templates
@@ -72,7 +84,7 @@ var Schema = mongoose.Schema;
 
 var shipmentSchema = new Schema({
 "ShipmentID": Number,
-"Status": String,
+"Status": { type: String, enum: ["Pending", "Shipped", "Delivered"] },
 "Order Count": {type: Number, default: 0},
 "DateShipped": Date
 });
@@ -103,11 +115,16 @@ var Customer = mongoose.model("Customer", customerSchema);
 var ShipmentOrder = mongoose.model("ShipmentOrder", shipmentorderSchema);
 
 async function checkLogin(username, password) {
-  const account = await Customer.findOne({ username, Password: password })
-    .select("CustomerID")
+  const account = await Customer.findOne({ username })
+    .select("CustomerID Password")
     .lean();
 
   if (!account) {
+    throw new Error("Invalid login credentials");
+  }
+
+  const match = await bcrypt.compare(password, account.Password);
+  if (!match) {
     throw new Error("Invalid login credentials");
   }
 
@@ -127,6 +144,23 @@ async function getNextShipmentId() {
   const lastShipment = await Shipment.findOne().sort({ ShipmentID: -1 }).select("ShipmentID").lean();
   return lastShipment ? lastShipment.ShipmentID + 1 : 1;
 }
+
+// Middleware: employee-only routes
+function requireEmployee(req, res, next) {
+  if (req.session.customerId !== 1) {
+    return res.redirect("/login");
+  }
+  next();
+}
+
+// Rate limiter: max 10 login attempts per 15 minutes per IP
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: 'Too many login attempts. Please try again in 15 minutes.'
+});
 
 //ROUTES BELOW
 
@@ -238,13 +272,17 @@ app.get("/login", (req, res) => {
   res.render('login', { error: error === 'invalid' ? 'Invalid username or password' : null });
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", loginLimiter, async (req, res) => {
   const { username, password } = req.body;
 
   try {
     const account = await checkLogin(username, password);
-    req.session.customerId = account.CustomerID;
-    res.redirect("/psa");
+    // Regenerate session to prevent session fixation
+    req.session.regenerate((err) => {
+      if (err) return res.redirect("/login?error=invalid");
+      req.session.customerId = account.CustomerID;
+      res.redirect("/psa");
+    });
   } catch (err) {
     res.redirect("/login?error=invalid");
   }
@@ -268,12 +306,13 @@ app.post("/createaccount", async (req, res) => {
     }
 
     const customerId = await getNextCustomerId();
+    const hashedPassword = await bcrypt.hash(password, 12);
     const newCustomer = new Customer({
       CustomerID: customerId,
       username,
       Name: name,
       Email: email,
-      Password: password
+      Password: hashedPassword
     });
 
     const savedCustomer = await newCustomer.save();
@@ -289,7 +328,7 @@ app.get("/accountcreation", (req, res) => {
   res.render('accountcreation', { error: error ? decodeURIComponent(error) : null });
 });
 
-app.get("/employeepsa", async (req, res) => {
+app.get("/employeepsa", requireEmployee, async (req, res) => {
   try {
     const shipmentId = req.query.shipmentId;
     const error = req.query.error;
@@ -348,11 +387,12 @@ app.get("/employeepsa", async (req, res) => {
   }
 });
 
-app.post("/employeepsa", async (req, res) => {
-  const { shipmentId, status, dateShipped } = req.body;
-  console.log('POST /employeepsa body:', req.body);
+const ALLOWED_STATUSES = ["Pending", "Shipped", "Delivered"];
 
-  if (!shipmentId || !status) {
+app.post("/employeepsa", requireEmployee, async (req, res) => {
+  const { shipmentId, status, dateShipped } = req.body;
+
+  if (!shipmentId || !ALLOWED_STATUSES.includes(status)) {
     return res.redirect(`/employeepsa?shipmentId=${shipmentId || ''}&error=update_failed`);
   }
 
@@ -381,7 +421,7 @@ app.post("/employeepsa", async (req, res) => {
   }
 });
 
-app.get("/employee-search", async (req, res) => {
+app.get("/employee-search", requireEmployee, async (req, res) => {
   const query = req.query.name ? req.query.name.trim() : '';
 
   if (!query) {
@@ -389,8 +429,9 @@ app.get("/employee-search", async (req, res) => {
   }
 
   try {
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const customers = await Customer.find({
-      Name: { $regex: query, $options: 'i' }
+      Name: { $regex: escapedQuery, $options: 'i' }
     }).lean();
 
     if (customers.length === 0) {
@@ -436,11 +477,11 @@ app.get("/employee-search", async (req, res) => {
   }
 });
 
-app.get("/createshipment", (req, res) => {
+app.get("/createshipment", requireEmployee, (req, res) => {
   res.render('createshipment');
 });
 
-app.post("/createshipment", async (req, res) => {
+app.post("/createshipment", requireEmployee, async (req, res) => {
   try {
     const shipmentId = await getNextShipmentId();
 
@@ -458,7 +499,7 @@ app.post("/createshipment", async (req, res) => {
   }
 });
 
-app.get("/createorder", async (req, res) => {
+app.get("/createorder", requireEmployee, async (req, res) => {
   try {
     const pendingShipments = await Shipment.find({ Status: "Pending" }).select("ShipmentID").lean();
     res.render('createorder', { pendingShipments });
@@ -468,7 +509,7 @@ app.get("/createorder", async (req, res) => {
   }
 });
 
-app.post("/createorder", async (req, res) => {
+app.post("/createorder", requireEmployee, async (req, res) => {
   try {
     const { customer, cardCount, shipmentId } = req.body;
 
