@@ -1,0 +1,23 @@
+[
+  {
+    "ShipmentID": 9001,
+    "Status": "In Transit",
+    "Order Count": 2,
+    "date": "06/01/2024",
+    "readyForPickup": false
+  },
+  {
+    "ShipmentID": 9002,
+    "Status": "Ready for Pickup",
+    "Order Count": 1,
+    "date": "06/02/2024",
+    "readyForPickup": true
+  },
+  {
+    "ShipmentID": 9003,
+    "Status": "Delivered",
+    "Order Count": 1,
+    "date": "06/03/2024",
+    "readyForPickup": false
+  }
+]

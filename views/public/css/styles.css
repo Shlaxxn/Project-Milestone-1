@@ -1,0 +1,320 @@
+nav {
+  padding: 0 !important;
+}
+.nav {
+  margin: 0;
+  background-color: #2a5496;
+  padding: 0px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 120px;
+  width: 100%;
+}
+.logo-img {
+    height: 80px;
+    width: auto;
+    padding: 10px;
+    display: flex;
+    vertical-align: middle;
+    border-radius: 20px;
+}
+body {
+  height: 100%;
+  padding: 0px;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+}
+.loginContainer{
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center;     /* Centers vertically */
+  margin: 0;     /* Remove default margin */
+  padding: 0;    /* Remove default padding */
+  box-sizing: border-box; /* Ensures padding and borders are included in the 100vw/100vh size, preventing overflow/scrollbars */
+  height: 100vh;
+  width: 100%;           /* Ensures the container fills the full page height */
+  outline: solid 1px black;
+  background-image: url('../images/pokemoncaseimage-3.png'); 
+  background-size: cover;
+  background-position: center;
+  background-color: rgb(84, 83, 83);
+  /*filter: blur(8px); /* Blurs only this element */
+}
+.loginForm{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 25px;
+  background-color: rgba(0, 0, 0, 0.75);
+    /* The first part (rgba...) adds a black overlay with 50% opacity */
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+table, th, td {
+  border: 1px solid;
+}
+th, td {
+  padding: 10px;
+}
+.welcome {
+  text-align: center;
+  align-items: center;
+  min-height: 100vh;
+  background-image: url('../images/AACardsStoreFront.jpg');
+  background-size: cover;
+  background-position: center;
+}
+.greating {
+  text-align: center;
+  margin-top: 200px;
+  margin-bottom: auto;
+  padding: 0 20px;
+}
+.greating h1,
+.greating h2 {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.about {
+  color:white;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  background-image: url('../images/AACardsStoreFront2.jpg');
+  background-size: cover;
+  background-position: center;
+  height: auto;
+  width: 100%;
+  text-shadow: #f4f4f4;
+}
+.inside {
+  height: 300px;
+}
+.banner {
+  /* Hide any overflowing content outside the banner area */
+  overflow: hidden;
+  /* Ensure content stays on a single line */
+  white-space: nowrap;
+  /* Optional: Add background, padding, or height styling */
+  background-color:orange;
+  color: white;
+  padding: 10px 0;
+  box-sizing: border-box;
+}
+
+.banner-content {
+  /* Use inline-block to keep everything in one line and allow flex properties */
+  display: inline-block;
+  /* Apply the animation */
+  animation: marquee 15s linear infinite;
+  /* Optional: Pause animation on hover */
+  /* For more details, see the BigCommerce article on animation-play-state */
+  animation-play-state: running;
+}
+
+.banner-content:hover {
+  animation-play-state: paused;
+}
+
+/* Define the animation */
+@keyframes marquee {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    /* Translate the content by -50% of its width to create the loop effect */
+    transform: translate(-50%, 0);
+  }
+}
+.psa-table {
+  min-height: 100vh;
+}
+footer{
+  background-color: #2a5496;
+  color:white;  
+  align-items: center;
+  padding: 10px;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  height: 80px;
+  justify-content: space-between;
+  font-size:large;
+}
+.social-links a {
+  font-size: 40px;
+  margin-right: 10px;
+  color: white; 
+  text-decoration: none;
+  width: 44px;
+  height: 44px;
+}
+.social-links a :hover{
+  color: lightgray;
+}
+.social-links {
+  flex: 1;
+  text-align: right;
+}
+.footer-name {
+  flex: 1;
+  text-align: center;
+}
+.footer-logo {
+  flex: 1;
+  text-align: left;
+}
+
+/* Left-side drawer nav on mobile */
+@media (max-width: 991.98px) {
+  #navbarNav {
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 280px;
+    height: 100vh;
+    background-color: #2a5496;
+    z-index: 1050;
+    padding-top: 80px;
+    transition: right 0.3s ease;
+    display: block !important;
+  }
+
+  #navbarNav.show {
+    right: 0;
+  }
+
+  #navbarNav.collapsing {
+    height: 100vh !important;
+    right: -280px;
+    transition: right 0.3s ease !important;
+  }
+
+  .navbar-nav {
+    flex-direction: column !important;
+    padding: 10px;
+  }
+
+  .nav-link {
+    padding: 12px 16px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .nav {
+    padding: 0px 10px;
+    height: 80px;
+  }
+  
+  .logo-img {
+    height: 50px;
+    padding: 5px;
+  }
+  
+  .loginContainer {
+    padding: 10px;
+  }
+  
+  .loginForm {
+    padding: 15px;
+    gap: 10px;
+  }
+  
+  table {
+    font-size: 14px;
+  }
+  
+  th, td {
+    padding: 5px;
+  }
+  
+  .greating {
+    margin-top: 80px;
+  }
+
+  .greating h1 {
+    font-size: 48px !important;
+  }
+
+  .greating h2 {
+    font-size: 32px !important;
+  }
+  
+  .inside {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  footer {
+    flex-direction: column;
+    height: auto;
+    text-align: center;
+  }
+  
+  .social-links {
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .footer-name {
+    margin: 10px 0;
+  }
+  
+  .footer-logo {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    padding: 0px 5px;
+    height: 60px;
+  }
+  
+  .logo-img {
+    height: 40px;
+  }
+  
+  .loginForm {
+    padding: 10px;
+  }
+  
+  table {
+    font-size: 12px;
+    overflow-x: auto;
+    display: block;
+  }
+  
+  .greating {
+    margin-top: 60px;
+  }
+
+  .greating h1 {
+    font-size: 32px !important;
+  }
+
+  .greating h2 {
+    font-size: 22px !important;
+  }
+
+  .banner {
+    padding: 5px 0;
+  }
+  
+  footer {
+    padding: 5px;
+  }
+  
+  .social-links a {
+    font-size: 30px;
+    margin-right: 5px;
+  }
+}

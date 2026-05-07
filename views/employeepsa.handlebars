@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PSA Tracking Main Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="nav">
+        <span class="navbar-brand">AA Cards and Collectibles</span>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/employeepsa">Shipments</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/employee-search">Customer Search</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/createorder">Create Order</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/createshipment">Create Shipment</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Log Out</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+
+      {{#if error}}
+        <div class="alert alert-danger">{{error}}</div>
+      {{/if}}
+
+      {{#if (eq view "details")}}
+
+        <!-- Shipment Details -->
+        <div class="row">
+          <div class="col-12 mb-4">
+            <h2>Shipment Details - ID: {{shipment.ShipmentID}}</h2>
+
+            <form action="/employeepsa" method="POST">
+              <input type="hidden" name="shipmentId" value="{{shipment.ShipmentID}}" />
+
+              <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select name="status" id="status" class="form-select" required>
+                  <option value="Pending" {{#eq shipment.Status "Pending"}}selected{{/eq}}>Pending</option>
+                  <option value="Shipped" {{#eq shipment.Status "Shipped"}}selected{{/eq}}>Shipped</option>
+                  <option value="Delivered" {{#eq shipment.Status "Delivered"}}selected{{/eq}}>Delivered</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="dateShipped" class="form-label">Date Shipped</label>
+                <input type="date" name="dateShipped" id="dateShipped" class="form-control"
+                  value="{{#if shipment.DateShipped}}{{formatDate shipment.DateShipped}}{{/if}}" />
+              </div>
+
+              <p><strong>Order Count:</strong> {{shipment.[Order Count]}}</p>
+
+              <button type="submit" class="btn btn-primary">Update Shipment</button>
+              <a href="/employeepsa" class="btn btn-secondary">Back to Shipments</a>
+            </form>
+          </div>
+        </div>
+
+        <!-- Orders in Shipment -->
+        <div class="row">
+          <div class="col-12">
+            <h3>Orders in this Shipment</h3>
+
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer Username</th>
+                  <th>Card Count</th>
+                  <th>Shipment Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {{#each orders}}
+                <tr>
+                  <td>{{this.OrderID}}</td>
+                  <td>{{this.CustomerUsername}}</td>
+                  <td>{{this.[Card Count]}}</td>
+                  <td>{{this.ShipmentStatus}}</td>
+                  <td>{{#if this.Date}}{{formatDate this.Date}}{{/if}}</td>
+
+                  <!-- ADDED DELETE ORDER BUTTON -->
+                  <td>
+                    <form method="POST" action="/deleteorder" style="display:inline;">
+                      <input type="hidden" name="orderId" value="{{this.OrderID}}">
+                      <button type="submit" class="btn btn-danger btn-sm"
+                        onclick="return confirm('Delete this order?')">
+                        Delete
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      {{else}}
+
+        <!-- Shipments List -->
+        <div class="row">
+          <div class="col-12 mb-4">
+            <h2>PSA Shipments</h2>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Shipment ID</th>
+                  <th>Status</th>
+                  <th>Order Count</th>
+                  <th>Date Shipped</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {{#each shipments}}
+                <tr>
+                  <td>{{this.ShipmentID}}</td>
+                  <td>{{this.Status}}</td>
+                  <td>{{this.[Order Count]}}</td>
+                  <td>{{#if this.DateShipped}}{{this.DateShipped}}{{else}}Not Shipped{{/if}}</td>
+
+                  <td>
+                    <a href="/employeepsa?shipmentId={{this.ShipmentID}}"
+                      class="btn btn-primary btn-sm">View Orders</a>
+
+                    <!-- ADDED DELETE SHIPMENT BUTTON -->
+                    <form method="POST" action="/deleteshipment" style="display:inline;">
+                      <input type="hidden" name="shipmentId" value="{{this.ShipmentID}}">
+                      <button type="submit" class="btn btn-danger btn-sm"
+                        onclick="return confirm('Delete this shipment?')">
+                        Delete
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      {{/if}}
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/nav.js"></script>
+  </body>
+</html>
